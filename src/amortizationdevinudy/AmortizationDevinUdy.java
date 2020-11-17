@@ -4,17 +4,14 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-//11 inputs to take in
 public class AmortizationDevinUdy
 {
 
+    @SuppressWarnings("UnusedAssignment")
     public static void main(String[] args)
     {
 
-        String name, address, city, state, dueDate, dueMonth;
+        String name, address, city, state, dueDate;
         int zip, loanMonth, loanDay, loanYear, paymentAmount, paymentNumber;
         double loanAmount, apr, interest, principle, balance, payment;
         InputFile loanReport;
@@ -22,12 +19,10 @@ public class AmortizationDevinUdy
 
         loanReport = new InputFile("fcrc loan data.txt");
 
-//        displayReport();
 //        Window Pane
         JFrame jf;
         JTextArea jta;
         JScrollPane jsp;
-//        int count;
 
         //the following instantiates the two objects
         jf = new JFrame();
@@ -36,7 +31,7 @@ public class AmortizationDevinUdy
         jsp = new JScrollPane(jta);
 
         // change the size and position of the window
-        jf.setSize(400, 350);
+        jf.setSize(700, 550);
         jf.setLocation(400, 250);
 
         //make the X box of the window stop the program
@@ -46,8 +41,8 @@ public class AmortizationDevinUdy
         jf.add(jsp);
 
         jf.setVisible(true);
-//        End Window pane details
 
+//        End Window pane details
         while (!loanReport.eof())
         {
             name = loanReport.readString();
@@ -61,59 +56,11 @@ public class AmortizationDevinUdy
             loanAmount = loanReport.readDouble();
             apr = loanReport.readDouble();
             paymentAmount = loanReport.readInt();
-            dueMonth = "";
 
-//            Month format
-        switch(loanMonth) {
-            case 1 -> dueMonth = "January";
-            case 2 -> dueMonth = "February";
-            case 3 -> dueMonth = "March";
-            case 4 -> dueMonth = "April";
-            case 5 -> dueMonth = "May";
-            case 6 -> dueMonth = "June";
-            case 7 -> dueMonth = "July";
-            case 8 -> dueMonth = "August";
-            case 9 -> dueMonth = "September";
-            case 10 -> dueMonth = "October";
-            case 11 -> dueMonth = "November";
-            case 12 -> dueMonth = "December";
-//            If december, add++ to counter at beginning of loop.
-        }
-        if (dueMonth.equals("December")) {
-            loanYear = loanYear++;
-        }
-//            End Month format
-
-            dueDate = dueMonth + " " + loanDay + "," + loanYear;
             balance = loanAmount;
             aprPercentage = apr * 100;
             payment = 0;
             paymentNumber = 0;
-
-//            Payment amount switch
-            switch (paymentAmount)
-            {
-                case 0 ->
-                    payment = 50;
-                case 1 ->
-                    payment = 55;
-                case 2 ->
-                    payment = 75;
-                case 3 ->
-                    payment = 100;
-                case 4 ->
-                    payment = 0.05 * loanAmount;
-                case 5 ->
-                    payment = 0.06 * loanAmount;
-                case 6 ->
-                    payment = 0.05 * loanAmount;
-                case 7 ->
-                    payment = 0.04 * loanAmount;
-                case 8 ->
-                    payment = 0.03 * loanAmount;
-                case 9 ->
-                    payment = 0.02 * loanAmount;
-            }
 
 //            Heading
             jta.append("First Community Redevelopment Corporation\n");
@@ -127,22 +74,69 @@ public class AmortizationDevinUdy
             jta.append("Loan Amount: \t" + "$" + loanAmount + "\n");
             jta.append("Interest Rate: \t" + Math.round(aprPercentage * 100.0) / 100.0 + "%\n");
             jta.append("\n");
-            jta.append("Payment# \t Due Date \t Payment \t Interest \t Principle \t Balance \n");
-            jta.append("--------------------------------------------------------------------\n");
+            jta.append("Payment# \t Due Date \t\tPayment \tInterest \tPrinciple \tBalance \n");
+            jta.append("---------------------------------------------------------------------------------\n");
 
-            int count;
-            double interestDisplay, principleDisplay, balanceDisplay, paymentTotal, interestTotal;
-            count = 0;
-            paymentTotal = 0;
-            interestTotal = 0;
+//            End Heading
 //            Table
+            int count;
+            double interestDisplay, principleDisplay, balanceDisplay;
+            String stringMonth = null;
+            count = 0;
+
+            //            Payment switch
+            switch (paymentAmount)
+            {
+                case 0 -> payment = 50;
+                case 1 -> payment = 55;
+                case 2 -> payment = 75;
+                case 3 -> payment = 100;
+                case 4 -> payment = 0.05 * loanAmount;
+                case 5 -> payment = 0.06 * loanAmount;
+                case 6 -> payment = 0.05 * loanAmount;
+                case 7 -> payment = 0.04 * loanAmount;
+                case 8 -> payment = 0.03 * loanAmount;
+                case 9 -> payment = 0.02 * loanAmount;
+            }
+
+//            End Payment switch
             while (balance > 0)
             {
                 count++;
                 paymentNumber++;
-                interest = apr / 12 * balance;
-                principle = payment - interest; //paymentAmount / 75
+
+//                Transaction dates
+                loanMonth++;
+
+                if (loanMonth > 13)
+                {
+                    loanMonth = 1;
+                    loanYear++;
+                }
+
+                switch (loanMonth)
+                {
+                    case 1 -> stringMonth = "Jan";
+                    case 2 -> stringMonth = "Feb";
+                    case 3 -> stringMonth = "Mar";
+                    case 4 -> stringMonth = "Apr";
+                    case 5 -> stringMonth = "May";
+                    case 6 -> stringMonth = "Jun";
+                    case 7 -> stringMonth = "Jul";
+                    case 8 -> stringMonth = "Aug";
+                    case 9 -> stringMonth = "Sept";
+                    case 10 -> stringMonth = "Oct";
+                    case 11 -> stringMonth = "Nov";
+                    case 12 -> stringMonth = "Dec";
+                }
+
+                dueDate = stringMonth + " " + loanDay + "," + loanYear;
+
+//                End transaction dates
+                interest = interestCalc(apr, balance);
+                principle = principleCalc(payment, interest);
                 balance -= principle;
+
                 interestDisplay = Math.round(interest * 100.0) / 100.0;
                 principleDisplay = Math.round(principle * 100.0) / 100.0;
 
@@ -153,60 +147,30 @@ public class AmortizationDevinUdy
                 }
                 balanceDisplay = Math.round(balance * 100.0) / 100.0;
 
-                jta.append("    " + paymentNumber + "\t" + dueDate + "          " + payment + "\t" + interestDisplay + "\t" + principleDisplay + "\t" + balanceDisplay + "\n");
-                if (dueMonth.equals("December")) {
-                    loanYear = loanYear++;
-                }
-                paymentTotal += payment;
-                interestTotal += interestDisplay;
+                jta.append("    " + paymentNumber + "\t" + dueDate + "\t\t" + payment + "\t" + interestDisplay + "\t" + principleDisplay + "\t" + balanceDisplay + "\n");
 
             }
-            
-//            jta.append("Totals: " + paymentTotal + " " + interestTotal + "\n");
-            jta.append("____________________________________________________________________\n");
 
+            jta.append("_____________________________________________________________________________________________\n");
+            jta.append("\n");
+
+//            End Table
         }
 //        End Window Pane
+    }
 
-//        LocalDateTime myDateObj = LocalDateTime.now();
-//        System.out.println("Before Formatting: " + myDateObj);
-////        default format is yyyy-MM-dd
-//        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
-//
-//        String formattedDate = myDateObj.format(myFormatObj);
-//        System.out.println("After Formatting: " + formattedDate);
-//        import java.util. *; 
-//
-//          Look into this -> Calendar Class in Java with examples; Java program to demonstrate add() method
-//        public class Calendar5
-//        {
-//
-//            public static void main(String[] args)
-//            {
-//                // creating calendar object 
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.add(Calendar.DATE, -15);
-//                System.out.println("15 days ago: " + calendar.getTime());
-//                calendar.add(Calendar.MONTH, 4);
-//                System.out.println("4 months later: " + calendar.getTime());
-//                calendar.add(Calendar.YEAR, 2);
-//                System.out.println("2 years later: " + calendar.getTime());
-//            }
-//        }
+    public static double interestCalc(double apr1, double bal1)
+    {
+        double interest;
+        interest = apr1 / 12 * bal1;
+        return interest;
+    }
 
-//                  Look at this too -> Get first days in a month with year input and first day input
-//                Scanner input = new Scanner(System.in);
-//                System.out.print("Enter Year:");
-//                int year = input.nextInt();
-//                Calendar cal = Calendar.getInstance();
-//                for (int i = 0; i < 12; i++)
-//                {
-//                    cal.set(year, i, 1);
-//                    System.out.printf("the first day of %s is %s\n",
-//                            cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault()),
-//                            cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()));
-//                }//end for i  
-
+    public static double principleCalc(double pay1, double int1)
+    {
+        double principle;
+        principle = pay1 - int1;
+        return principle;
     }
 
 }
