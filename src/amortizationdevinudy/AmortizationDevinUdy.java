@@ -3,6 +3,9 @@ package amortizationdevinudy;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 
 public class AmortizationDevinUdy
 {
@@ -16,6 +19,9 @@ public class AmortizationDevinUdy
         double loanAmount, apr, interest, principle, balance, payment;
         InputFile loanReport;
         double aprPercentage;
+        NumberFormat currform;
+        currform = NumberFormat.getCurrencyInstance();
+
 
         loanReport = new InputFile("fcrc loan data.txt");
 
@@ -71,7 +77,7 @@ public class AmortizationDevinUdy
             jta.append("\t\t\t\t" + address + "\n");
             jta.append("\t\t\t\t" + city + ", " + state + ", " + zip + "\n");
             jta.append("\n");
-            jta.append("Loan Amount: \t" + "$" + loanAmount + "\n");
+            jta.append("Loan Amount: \t" + "$" + currform.format(loanAmount) + "\n");
             jta.append("Interest Rate: \t" + Math.round(aprPercentage * 100.0) / 100.0 + "%\n");
             jta.append("\n");
             jta.append("Payment# \t Due Date \t\tPayment \tInterest \tPrinciple \tBalance \n");
@@ -147,7 +153,7 @@ public class AmortizationDevinUdy
                 }
                 balanceDisplay = Math.round(balance * 100.0) / 100.0;
 
-                jta.append("    " + paymentNumber + "\t" + dueDate + "\t\t" + payment + "\t" + interestDisplay + "\t" + principleDisplay + "\t" + balanceDisplay + "\n");
+                jta.append("    " + paymentNumber + "\t" + dueDate + "\t\t" + currform.format(payment) + "\t" + interestDisplay + "\t" + currform.format(principleDisplay) + "\t" + currform.format(balanceDisplay) + "\n");
 
             }
 
